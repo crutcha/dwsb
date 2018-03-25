@@ -1,0 +1,11 @@
+create_table("users", func(t) {
+	t.Column("id", "uuid", {"primary": true})
+	t.Column("name", "text", {})
+	t.Column("provider", "text", {})
+	t.Column("provider_id", "text", {})
+	t.Column("discord_id", "text", {})
+	t.Column("code", "text", {})
+	t.Column("expires_at", "timestamp", {})
+	t.Column("access_token", "text", {})
+	t.Column("refresh_token", "text", {})
+})

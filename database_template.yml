@@ -1,0 +1,24 @@
+development:
+  dialect: "mysql"
+  database: {YOUR_DATABASE_NAME}
+  host: {DATABASE_HOST}
+  port: {DATABASE_PORT}
+  user: {DATABASE_USER}
+  password: {DATABASE_PASSWORD}
+
+test:
+  dialect: "mysql"
+  database: {YOUR_DATABASE_NAME}
+  host: {DATABASE_HOST}
+  port: {DATABASE_PORT}
+  user: {DATABASE_USER}
+  password: {DATABASE_PASSWORD}
+
+production:
+  dialect: "mysql"
+  database: {YOUR_DATABASE_NAME}
+  host: {DATABASE_HOST}
+  port: {DATABASE_PORT}
+  user: {DATABASE_USER}
+  password: {DATABASE_PASSWORD}
+

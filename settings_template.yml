@@ -1,0 +1,3 @@
+media:
+  location: {MEDIA_STORAGE_LCATION}
+  maxsize: {MAX_SIZE_IN_KB}

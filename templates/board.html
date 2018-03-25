@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Discord Web Soundboard</title>
+  <!-- Bootstrap core CSS-->
+  <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom fonts for this template-->
+  <link href="/assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+  <!-- Custom styles for this template-->
+  <link href="/assets/css/sb-admin.css" rel="stylesheet">
+  <!-- Discord Soundboard CSS Overrides -->
+  <!-- <link href="/assets/css/discordsb.css" rel="stylesheet"> -->
+
+<body class="bg" id="page-top">
+
+    <div class="container-fluid">
+      <!-- Breadcrumbs-->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><%= current_user.Name %></li>
+        <li class="breadcrumb-item active">
+          <a href="/logout" >Logout</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/upload">Upload Clip</a>
+        </li>
+      </ol>
+        <div class="row">
+            <div class="col-lg-9 col-md-12">
+                  <h1>Discord Web Soundboard</h1>
+            </div>
+            <div class="col-lg-3" style="padding: 10px;">
+                <select class="form-control" id="guildselect">
+                    <%= for (value) in selectmap { %>
+                        <%= for (key, value) in value { %>
+                                <%= if (defaultselect == value) { %>
+                                    <option selected value="<%= value %>"><%= key %></option>
+                                <% } else { %>
+                                    <option value="<%= value %>"><%= key %></option>
+                                <% } %>
+                        <% } %>
+                    <% } %>
+                </select>
+            </div>
+        </div>
+      <hr>
+      <div id="clipboard">
+    </div>
+    </div>
+    <!-- /.container-fluid-->
+    <!-- Bootstrap core JavaScript-->
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="/assets/js/jquery.easing.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="/assets/js/sb-admin.min.js"></script>
+    <!-- Custom scripts for this page-->
+    <!-- Toggle between fixed and assets navbar-->
+    <script>
+    $('#toggleNavPosition').click(function() {
+      $('body').toggleClass('fixed-nav');
+      $('nav').toggleClass('fixed-top assets-top');
+    });
+
+    </script>
+    <!-- Toggle between dark and light navbar-->
+    <script>
+    $('#guildselect').change(function() {
+        updateBoard(this.value);
+    });
+    </script>
+    <script>
+    $(document).ready(function() {
+        $('#clipboard').empty();
+        var currentGuild = $('#guildselect').find(':selected').val();
+        updateBoard(currentGuild);
+    });
+    </script>
+    <script>
+    function playSound(id) {
+        console.log("CALLED THIS SHIT");
+        $.ajax({
+            url: "/play",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({'name': id})
+            }).done(function() {
+                console.log('done');
+            });
+    }
+    function updateBoard(guild) {
+        var data = JSON.stringify({'guild': guild});
+        $.ajax({
+            url: "/board",
+            type: "POST",
+            contentType: "application/json",
+            data: data,
+            success: function(response) {
+                var clipboard = $('#clipboard');
+                clipboard.empty();
+                console.log(response);
+                var innerHtml = '';
+                innerHtml += '<div class="row">';
+                for (i = 0; i < response.length; i++) {
+                    innerHtml += '<div class="col-lg-3 col-md-6">';
+                    innerHtml += '<a class="btn btn-secondary btn-lg btn-block" style="margin-bottom: 15px;" href="#" onClick=playSound("' + response[i].id + '")>' + response[i].name + '</a>';
+                    innerHtml += '</div>';
+                }
+                innerHtml += '</div>';
+                clipboard.append(innerHtml);
+            }
+        });
+    }
+    </script>
+</body>
+
+</html>

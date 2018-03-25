@@ -1,0 +1,14 @@
+h1, h2, h3, h4, h5, h6 {
+  color: #fff;
+}
+
+.bg-dark {
+  font-family: "Comfortaa";
+  font-weight: bolder;
+}
+
+.btn-secondary:hover {
+  transform: scale(1.10);
+  transition: all 5ms ease;
+  font-weight: bold;
+}
