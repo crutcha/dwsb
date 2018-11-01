@@ -4,6 +4,7 @@ import (
 	"dwsb/models"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
@@ -32,6 +33,20 @@ func LoginRequired(next buffalo.Handler) buffalo.Handler {
 		if userid := c.Session().Get("current_user_id"); userid == nil {
 			return c.Redirect(302, "/login")
 		}
+
+		// Although buffalo.Context type has method Value() to pull
+		// data that's been stashed into a context, it appears this is
+		// only temporary and gets flushed at some point, so we can't
+		// use it to validate oAuth expiration and need to rely on a Session
+		// variable instead.
+		if expiry := c.Session().Get("current_user_expiry"); expiry != nil {
+			expTime, timeErr := time.Parse(time.RFC3339, expiry.(string))
+			currentTime := time.Now()
+			if currentTime.After(expTime) {
+				return c.Redirect(302, "/login")
+			}
+		}
+
 		return next(c)
 	}
 }
@@ -56,22 +71,25 @@ func AuthCallback(c buffalo.Context) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-	} else {
-		record.Name = user.Name
-		record.Provider = user.Provider
-		record.ProviderID = user.UserID
-		record.Code = c.Param("code")
-		record.ExpiresAt = user.ExpiresAt
-		record.AccessToken = user.AccessToken
-		record.RefreshToken = user.RefreshToken
-		err := models.DB.Save(record)
-		if err != nil {
-			return errors.WithStack(err)
-		}
+	}
+
+	record.Name = user.Name
+	record.Provider = user.Provider
+	record.ProviderID = user.UserID
+	record.Code = c.Param("code")
+	record.ExpiresAt = user.ExpiresAt
+	record.AccessToken = user.AccessToken
+	record.RefreshToken = user.RefreshToken
+	dbErr := models.DB.Save(record)
+	if dbErr != nil {
+		return errors.WithStack(err)
 	}
 
 	// Set session
+	expiry := record.ExpiresAt.Format(time.RFC3339)
 	c.Session().Set("current_user_id", record.ID)
+	c.Session().Set("current_user_expiry", expiry)
+	fmt.Println(c.Session().Get("current_user_expiry"))
 	err = c.Session().Save()
 	if err != nil {
 		return errors.WithStack(err)
@@ -84,6 +102,11 @@ func AuthCallback(c buffalo.Context) error {
 func SetCurrentUser(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
 		if uid := c.Session().Get("current_user_id"); uid != nil {
+			// Although buffalo.Context type has method Value() to pull
+			// data that's been stashed into a context, it appears this is
+			// only temporary and gets flushed at some point, so we can't
+			// use it to validate oAuth expiration and need to rely on a Session
+			// variable instead.
 			u := &models.User{}
 			tx := c.Value("tx").(*pop.Connection)
 			err := tx.Find(u, uid)

@@ -1,13 +1,13 @@
--- MySQL dump 10.13  Distrib 5.7.21, for Linux (x86_64)
+-- MySQL dump 10.15  Distrib 10.0.34-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: discordsoundboard_development
 -- ------------------------------------------------------
--- Server version	5.7.21-0ubuntu0.16.04.1
+-- Server version	10.0.34-MariaDB-0ubuntu0.16.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -43,7 +43,7 @@ DROP TABLE IF EXISTS `schema_migration`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `schema_migration` (
   `version` varchar(255) NOT NULL,
-  UNIQUE KEY `version_idx` (`version`)
+  UNIQUE KEY `schema_migration_version_idx` (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -79,4 +79,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-25  5:19:21
+-- Dump completed on 2018-08-05 22:58:31

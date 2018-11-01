@@ -30,7 +30,7 @@ func App() *buffalo.App {
 		app = buffalo.New(buffalo.Options{
 			Env:         ENV,
 			SessionName: "_dwsb_session",
-			Host:        "http://bot.crutchfield.io",
+			Host:        "http://dev.dwsb.io",
 		})
 		// Automatically redirect to SSL
 		app.Use(ssl.ForceSSL(secure.Options{
@@ -60,6 +60,7 @@ func App() *buffalo.App {
 
 		//Custom middleware
 		app.Use(LoginRequired)
+
 		app.Use(SetCurrentUser)
 
 		// Do not apply LoginRequired to login URI or oAuth, this creates a redirect loop

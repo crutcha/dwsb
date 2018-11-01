@@ -27,3 +27,5 @@ TODO:
 - [ ] Update styling for clip board  
 - [ ] Update loadSoundBuffer to pass a channel to opus handler
 - [ ] Track a clip's creator, allow for clip deletion 
+- [ ] Look into object storage and it's effect on playback performance
+- [ ] Convert input MP3 in memory instead of subprocess call to FFMPEG
