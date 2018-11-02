@@ -32,9 +32,16 @@ func HomeHandler(c buffalo.Context) error {
 		fmt.Println("USER ERROR: ", err)
 	}
 
-	selectArr := client.CreateGuildArray(user)
-	c.Set("selectmap", selectArr)
-	c.Set("defaultselect", defaultSelect)
+	selectArr, err := client.CreateGuildArray(user)
 
-	return c.Render(200, r.HTML("board.html"))
+	if err != nil {
+		// Force re-login to deal with token refresh
+		c.Session().Clear()
+		return c.Redirect(302, "/login")
+	} else {
+		c.Set("selectmap", selectArr)
+		c.Set("defaultselect", defaultSelect)
+		return c.Render(200, r.HTML("board.html"))
+	}
+
 }

@@ -3,6 +3,7 @@ package client
 import (
 	"dwsb/models"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/koding/cache"
@@ -24,12 +25,13 @@ func init() {
 // Discordgo uses bot token instead of bearer and also use websocket API. Since this is the only
 // RESTful call, simple use built-in HTTP library to do GET and grab guild JSON then map it to
 // guild struct.
-func GetGuildsForUser(user models.User) []discordgo.UserGuild {
+func GetGuildsForUser(user models.User) ([]discordgo.UserGuild, error) {
 	data, err := guildCache.Get(user.Name)
 	if err == nil {
-		return data.([]discordgo.UserGuild)
+		return data.([]discordgo.UserGuild), nil
 	}
 
+	guilds := make([]discordgo.UserGuild, 0)
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://discordapp.com/api/v6/users/@me/guilds", nil)
 	if err != nil {
@@ -37,11 +39,17 @@ func GetGuildsForUser(user models.User) []discordgo.UserGuild {
 	}
 	req.Header.Add("Authorization", "Bearer "+user.AccessToken)
 	res, err := client.Do(req)
+
+	// Handle errors or authentication problems
 	if err != nil {
 		fmt.Println("RESP ERR: ", err)
 	}
+	if res.StatusCode == 401 {
+		// Raise error here to be passed back up through stack, although maybe there's
+		// a better way to do this....
+		return guilds, errors.New("401 Unauthorized Token")
+	}
 
-	guilds := make([]discordgo.UserGuild, 0)
 	body, err := ioutil.ReadAll(res.Body)
 
 	// TODO: auth errors are failing silently but exist within the body of the returned
@@ -52,29 +60,33 @@ func GetGuildsForUser(user models.User) []discordgo.UserGuild {
 
 	guildCache.Set(user.Name, guilds)
 
-	return guilds
+	return guilds, nil
 }
 
 // Create hashmap of guild choices so we can use CSRF in multiple spots
 // TODO: this is used in multiple spots, which could potentially create a lot of API calls.
 // Maybe see if this can be cached locally instead of having to save info in database?
-func CreateGuildArray(user models.User) []map[string]string {
-	guilds := GetGuildsForUser(user)
+func CreateGuildArray(user models.User) ([]map[string]string, error) {
+	guilds, guildErr := GetGuildsForUser(user)
 	selectArr := make([]map[string]string, 0)
-	for _, value := range guilds {
-		selectMap := make(map[string]string)
-		selectMap[value.Name] = value.ID
-		selectArr = append(selectArr, selectMap)
+
+	if guildErr == nil {
+		for _, value := range guilds {
+			selectMap := make(map[string]string)
+			selectMap[value.Name] = value.ID
+			selectArr = append(selectArr, selectMap)
+		}
 	}
 
-	return selectArr
+	return selectArr, guildErr
 }
 
 // Need to also be able to produce guilds as hashmap since templating engine form select
 // does not handle arrays well.
 func CreateGuildHashmap(user models.User) map[string]string {
-	guilds := GetGuildsForUser(user)
+	guilds, tempErr := GetGuildsForUser(user)
 	selectMap := make(map[string]string)
+	fmt.Println("HASHTEMPERR: ", tempErr)
 	for _, value := range guilds {
 		selectMap[value.Name] = value.ID
 	}
