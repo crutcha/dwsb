@@ -14,18 +14,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+var DiscordProvider goth.Provider
+
 func init() {
 	gothic.Store = App().SessionStore
 
-	goth.UseProviders(
-		discord.New(
-			os.Getenv("DISCORD_CLIENT_ID"),
-			os.Getenv("DISCORD_CLIENT_SECRET"),
-			fmt.Sprintf("%s%s", App().Host, "/auth/discord/callback"),
-			"identify",
-			"guilds",
-		),
+	DiscordProvider = discord.New(
+		os.Getenv("DISCORD_CLIENT_ID"),
+		os.Getenv("DISCORD_CLIENT_SECRET"),
+		fmt.Sprintf("%s%s", App().Host, "/auth/discord/callback"),
+		"identify",
+		"guilds",
 	)
+
+	goth.UseProviders(DiscordProvider)
 }
 
 func LoginRequired(next buffalo.Handler) buffalo.Handler {
@@ -40,10 +42,23 @@ func LoginRequired(next buffalo.Handler) buffalo.Handler {
 		// use it to validate oAuth expiration and need to rely on a Session
 		// variable instead.
 		if expiry := c.Session().Get("current_user_expiry"); expiry != nil {
-			expTime, timeErr := time.Parse(time.RFC3339, expiry.(string))
+			expTime, _ := time.Parse(time.RFC3339, expiry.(string))
 			currentTime := time.Now()
+			isAvailable := DiscordProvider.RefreshTokenAvailable()
+			fmt.Println("AVAILABLE? ", isAvailable)
+
+			// TODO: this logic to pull a user out of database is happening often,
+			// abstract this away
 			if currentTime.After(expTime) {
-				return c.Redirect(302, "/login")
+				uid := c.Session().Get("current_user_id")
+				u := &models.User{}
+				tx := c.Value("tx").(*pop.Connection)
+				_ = tx.Find(u, uid)
+				newToken, rtErr := DiscordProvider.RefreshToken(u.RefreshToken)
+				u.AccessToken = newToken.AccessToken
+				u.RefreshToken = newToken.RefreshToken
+				u.ExpiresAt = newToken.Expiry
+				_ = models.DB.Save(u)
 			}
 		}
 
@@ -102,11 +117,6 @@ func AuthCallback(c buffalo.Context) error {
 func SetCurrentUser(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
 		if uid := c.Session().Get("current_user_id"); uid != nil {
-			// Although buffalo.Context type has method Value() to pull
-			// data that's been stashed into a context, it appears this is
-			// only temporary and gets flushed at some point, so we can't
-			// use it to validate oAuth expiration and need to rely on a Session
-			// variable instead.
 			u := &models.User{}
 			tx := c.Value("tx").(*pop.Connection)
 			err := tx.Find(u, uid)

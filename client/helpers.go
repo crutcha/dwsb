@@ -43,7 +43,13 @@ func GetGuildsForUser(user models.User) []discordgo.UserGuild {
 
 	guilds := make([]discordgo.UserGuild, 0)
 	body, err := ioutil.ReadAll(res.Body)
+
+	// TODO: auth errors are failing silently but exist within the body of the returned
+	// payload. When this is the case JSON will fail to unmarshal, we need to handle this
+	// somehow.
+	fmt.Println("BODY ", string(body))
 	err = json.Unmarshal(body, &guilds)
+
 	guildCache.Set(user.Name, guilds)
 
 	return guilds
