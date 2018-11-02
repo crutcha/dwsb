@@ -54,7 +54,10 @@ func LoginRequired(next buffalo.Handler) buffalo.Handler {
 				u := &models.User{}
 				tx := c.Value("tx").(*pop.Connection)
 				_ = tx.Find(u, uid)
-				newToken, rtErr := DiscordProvider.RefreshToken(u.RefreshToken)
+
+				// TODO: this should be logged
+				newToken, _ := DiscordProvider.RefreshToken(u.RefreshToken)
+
 				u.AccessToken = newToken.AccessToken
 				u.RefreshToken = newToken.RefreshToken
 				u.ExpiresAt = newToken.Expiry
