@@ -96,7 +96,9 @@ func PlaySound(file models.Clip) {
 			defer changeVoiceReady(file.Guild)
 
 			//playAudioFile(vc, filePath, make(chan bool))
-			loadSoundBuffer(vc, filePath)
+			buffErr := loadSoundBuffer(vc, filePath)
+			// log this
+			fmt.Println("BUFFERR: ", buffErr)
 		} else {
 			fmt.Println("Guild Voice not ready")
 		}

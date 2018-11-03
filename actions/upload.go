@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop"
@@ -39,7 +40,8 @@ func UploadCreate(c buffalo.Context) error {
 
 	// Populate fields not in form that are needed for model
 	upload, _ := c.File("file")
-	clip.File = upload.Filename
+	fileName := strings.Replace(upload.Filename, ".mp3", ".dca", 1)
+	clip.File = fileName
 	clip.Tag = upload.Filename
 	if err := c.Bind(clip); err != nil {
 		return errors.WithStack(err)
@@ -49,7 +51,7 @@ func UploadCreate(c buffalo.Context) error {
 	if _, err := os.Stat(guildpath); os.IsNotExist(err) {
 		os.Mkdir(guildpath, os.ModePerm)
 	}
-	f, err := os.Create(guildpath + "/" + clip.File)
+	f, err := os.Create(guildpath + "/" + clip.Tag)
 
 	if err != nil {
 		return errors.WithStack(err)
@@ -58,14 +60,14 @@ func UploadCreate(c buffalo.Context) error {
 	_, err = io.Copy(f, upload.File)
 
 	//Convert MP3 to Opus
-	opusErr := client.EncodeOpus(f)
+	opusErr := client.EncodeOpus(guildpath, clip)
 
 	// If encoding succeeded, save to database, else alert
 	if opusErr == nil {
 		tx := c.Value("tx").(*pop.Connection)
 
 		// Update with DCA file after MP3 conversion
-		clip.File = upload.Filename + ".dca"
+		//clip.File = upload.Filename + ".dca"
 		err := tx.Create(clip)
 		if err != nil {
 			return errors.WithStack(err)

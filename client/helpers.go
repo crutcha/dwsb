@@ -9,7 +9,6 @@ import (
 	"github.com/koding/cache"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"os/exec"
 	"time"
 )
@@ -86,7 +85,6 @@ func CreateGuildArray(user models.User) ([]map[string]string, error) {
 func CreateGuildHashmap(user models.User) map[string]string {
 	guilds, tempErr := GetGuildsForUser(user)
 	selectMap := make(map[string]string)
-	fmt.Println("HASHTEMPERR: ", tempErr)
 	for _, value := range guilds {
 		selectMap[value.Name] = value.ID
 	}
@@ -94,13 +92,13 @@ func CreateGuildHashmap(user models.User) map[string]string {
 	return selectMap
 }
 
-func EncodeOpus(src *os.File) error {
+func EncodeOpus(path string, src *models.Clip) error {
 
 	// Let FFMPEG do all the heavy lifting
 	// TODO: use DCA module instead of passing through bash pipe
-	name := src.Name() + ".dca"
-	combined := exec.Command("bash", "-c", "ffmpeg -i "+src.Name()+" -f s16le -ar 48000 -ac 2 pipe:1 | dca > "+name)
-	fmt.Println(combined)
+	inFile := path + "/" + src.Tag
+	outFile := path + "/" + src.File
+	combined := exec.Command("bash", "-c", "ffmpeg -i "+inFile+" -f s16le -ar 48000 -ac 2 pipe:1 | dca > "+outFile)
 	_, err := combined.CombinedOutput()
 
 	return err
