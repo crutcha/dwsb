@@ -17,6 +17,7 @@ type Clip struct {
 	Tag       string    `json:"tag" db:"tag"`
 	File      string    `json:"file" db:"file"`
 	Guild     string    `json:"guild" db:"guild"`
+	User      User      `json:"user" has_one:"user" fk_id:"id"`
 }
 
 // String is not required by pop and may be deleted

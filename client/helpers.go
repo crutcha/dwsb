@@ -83,7 +83,7 @@ func CreateGuildArray(user models.User) ([]map[string]string, error) {
 // Need to also be able to produce guilds as hashmap since templating engine form select
 // does not handle arrays well.
 func CreateGuildHashmap(user models.User) map[string]string {
-	guilds, tempErr := GetGuildsForUser(user)
+	guilds, _ := GetGuildsForUser(user)
 	selectMap := make(map[string]string)
 	for _, value := range guilds {
 		selectMap[value.Name] = value.ID

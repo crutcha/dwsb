@@ -36,6 +36,9 @@ func UploadHandler(c buffalo.Context) error {
 }
 
 func UploadCreate(c buffalo.Context) error {
+	// TODO: abstract all this out. the grabbing of DB client, lookup
+	// of user, etc...
+	tx := c.Value("tx").(*pop.Connection)
 	clip := &models.Clip{}
 
 	// Populate fields not in form that are needed for model
@@ -43,6 +46,11 @@ func UploadCreate(c buffalo.Context) error {
 	fileName := strings.Replace(upload.Filename, ".mp3", ".dca", 1)
 	clip.File = fileName
 	clip.Tag = upload.Filename
+
+	// Grab user record to populate FK on clip record
+	uid := c.Session().Get("current_user_id")
+	user := models.User{}
+	err := tx.Find(&user, uid)
 	if err := c.Bind(clip); err != nil {
 		return errors.WithStack(err)
 	}
@@ -67,7 +75,8 @@ func UploadCreate(c buffalo.Context) error {
 		tx := c.Value("tx").(*pop.Connection)
 
 		// Update with DCA file after MP3 conversion
-		//clip.File = upload.Filename + ".dca"
+		// TODO: this should probably go somewhere else?
+		clip.User = user
 		err := tx.Create(clip)
 		if err != nil {
 			return errors.WithStack(err)
