@@ -4,6 +4,6 @@ create_table("clips") {
 	t.Column("tag", "text", {})
 	t.Column("file", "text", {})
 	t.Column("guild", "text", {})
-    t.Column("user_id", "uuid", {})
-    t.ForeignKey("user_id", {"users": ["id"]}, {"on_delete": "cascade"})
+    t.Column("user", "uuid", {})
+    t.ForeignKey("user", {"users": ["id"]}, {"on_delete": "cascade"})
 }
