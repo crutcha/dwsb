@@ -19,6 +19,7 @@ type User struct {
 	ProviderID   string    `json:"provider_id" db:"provider_id"`
 	DiscordID    string    `json:"discord_id" db:"discord_id"`
 	Code         string    `json:"code" db:"code"`
+	Clips        Clips     `has_many:"clips"`
 	ExpiresAt    time.Time `json:"expires_at" db:"expires_at"`
 	AccessToken  string    `json:"access_token" db:"access_token"`
 	RefreshToken string    `json:"refresh_token" db:"refresh_token"`
