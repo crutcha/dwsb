@@ -1,4 +1,4 @@
-create_table("users", func(t) {
+create_table("users") {
 	t.Column("id", "uuid", {"primary": true})
 	t.Column("name", "text", {})
 	t.Column("provider", "text", {})
@@ -8,4 +8,4 @@ create_table("users", func(t) {
 	t.Column("expires_at", "timestamp", {})
 	t.Column("access_token", "text", {})
 	t.Column("refresh_token", "text", {})
-})
+}

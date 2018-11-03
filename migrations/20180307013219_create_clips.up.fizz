@@ -1,7 +1,9 @@
-create_table("clips", func(t) {
+create_table("clips") {
 	t.Column("id", "uuid", {"primary": true})
 	t.Column("name", "text", {})
 	t.Column("tag", "text", {})
 	t.Column("file", "text", {})
 	t.Column("guild", "text", {})
-})
+    t.Column("user_id", "uuid", {})
+    t.ForeignKey("user_id", {"users": ["id"]}, {"on_delete": "cascade"})
+}
