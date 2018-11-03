@@ -1,6 +1,6 @@
 -- MySQL dump 10.15  Distrib 10.0.36-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: discordsoundboard_development
+-- Host: localhost    Database: dwsb
 -- ------------------------------------------------------
 -- Server version	10.0.36-MariaDB-0ubuntu0.16.04.1
 
@@ -82,4 +82,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-03 19:30:10
+-- Dump completed on 2018-11-03 23:19:45
