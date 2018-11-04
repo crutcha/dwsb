@@ -76,7 +76,7 @@ func UploadCreate(c buffalo.Context) error {
 
 		// Update with DCA file after MP3 conversion
 		// TODO: this should probably go somewhere else?
-		clip.User = user
+		clip.UserID = user.ID
 		err := tx.Create(clip)
 		if err != nil {
 			return errors.WithStack(err)

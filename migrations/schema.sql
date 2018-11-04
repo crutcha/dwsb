@@ -1,6 +1,6 @@
 -- MySQL dump 10.15  Distrib 10.0.36-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: dwsb
+-- Host: localhost    Database: testing
 -- ------------------------------------------------------
 -- Server version	10.0.36-MariaDB-0ubuntu0.16.04.1
 
@@ -28,12 +28,12 @@ CREATE TABLE `clips` (
   `tag` text NOT NULL,
   `file` text NOT NULL,
   `guild` text NOT NULL,
-  `user` char(36) NOT NULL,
+  `user_id` char(36) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `user` (`user`),
-  CONSTRAINT `clips_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `clips_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -82,4 +82,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-03 23:19:45
+-- Dump completed on 2018-11-04 23:54:24
