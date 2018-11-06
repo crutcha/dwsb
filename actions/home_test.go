@@ -1,7 +1,9 @@
 package actions
 
+// TODO: need to test both unauthenticated and authenticated attempts
 func (as *ActionSuite) Test_HomeHandler() {
 	res := as.HTML("/").Get()
-	as.Equal(200, res.Code)
-	as.Contains(res.Body.String(), "Welcome to Buffalo")
+	location, _ := res.Result().Location()
+	as.Equal(302, res.Code)
+	as.Equal("/login", location.String())
 }
