@@ -73,6 +73,7 @@ func App() *buffalo.App {
 		app.POST("/upload", UploadCreate)
 		app.POST("/play", PlayHandler)
 		app.POST("/board", BoardHandler)
+		app.GET("/user", UserHandler)
 
 		// Static Files
 		app.ServeFiles("/assets", assetsBox)

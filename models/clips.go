@@ -2,11 +2,12 @@ package models
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/uuid"
 	"github.com/gobuffalo/validate"
 	"github.com/gobuffalo/validate/validators"
-	"time"
 )
 
 type Clip struct {
@@ -17,7 +18,6 @@ type Clip struct {
 	Tag       string    `json:"tag" db:"tag"`
 	File      string    `json:"file" db:"file"`
 	Guild     string    `json:"guild" db:"guild"`
-	User      User      `json:"user" belongs_to:"user"`
 	UserID    uuid.UUID `db:"user_id" fk_id:"id"`
 }
 
